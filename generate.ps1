@@ -15,16 +15,16 @@ $entries = @(
   # "1990 IT WORKS!"
   # "1991 OOPS!"
   # "1992 I DID IT AGAIN"
-  # "1993 DO NOT DEBUG!" # !!!
-  "1994 JUST DO IT"
+  # "1993 DO NOT DEBUG!" # !!! not all text
+  # "1994 JUST DO IT" # !!! wait for results
   # "1995 WORKS FOR ME"
-  "1996 DELETE PROD"
-  "1997 NOT TODAY"
-  "1998 NO REGRETS"
-  # "1999 I KNOW BETTER"
-  # "2000 WHO CARES"
-  # "2001 MADONNA"
-  # "2002 LADY GAGA"
+  # "1996 DELETE PROD" # !!! not all text
+  # "1997 NOT TODAY"
+  # "1998 NO REGRETS"
+  "1999 I KNOW BETTER"
+  # "2000 STAY HUNGRY"
+  # "2001 DREAM BIG"
+  # "2002 MADONNA"
   # "2003 JESSICA LANGE"
   # "2004 KATHY BATES"
   # "2005 HEROES III"
