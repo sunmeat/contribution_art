@@ -16,7 +16,7 @@ $entries = @(
   # "1991 OOPS!"
   # "1992 I DID IT AGAIN"
   # "1993 DO NOT DEBUG!" # !!! not all text
-  # "1994 JUST DO IT" # !!! wait for results
+  "1994 JUST DO IT"
   # "1995 WORKS FOR ME"
   # "1996 DELETE PROD" # !!! not all text
   # "1997 NOT TODAY"
@@ -35,7 +35,7 @@ $entries = @(
   # "2010 KNOTTY PINE!"
   # "2011 SEND NUDES"
   # "2012 SURPRISE B-CH"
-  "2013 STOP THE WAR"
+  # "2013 STOP THE WAR"
 )
 
 # --- font -------------------------------------------------------------------
