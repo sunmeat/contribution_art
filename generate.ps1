@@ -6,7 +6,7 @@
 
 # --- settings ---------------------------------------------------------------
 $perDay = 5          # commits per lit pixel (more commits = darker green square)
-$branch = 'master'   # branch to push to
+$branch = 'main'   # branch to push to
 $dryRun = $false     # true = only count commits, do not create or push anything
 
 # one entry = "year text"; latin and cyrillic can be mixed in one line
