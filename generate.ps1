@@ -34,8 +34,8 @@ $entries = @(
   # "2009 SUNMEAT"
   # "2010 KNOTTY PINE!"
   # "2011 SEND NUDES"
-  "2012 SURPRISE B-CH"
-  # "2013 STOP WAR"
+  # "2012 SURPRISE B-CH"
+  "2013 STOP THE WAR"
 )
 
 # --- font -------------------------------------------------------------------
