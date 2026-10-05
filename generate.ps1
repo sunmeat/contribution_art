@@ -6,13 +6,13 @@
 
 # --- settings ---------------------------------------------------------------
 $perDay = 5          # commits per lit pixel (more commits = darker green square)
-$branch = 'main'   # branch to push to
+$branch = 'main'     # branch to push to
 $dryRun = $false     # true = only count commits, do not create or push anything
 
 # one entry = "year text"; latin and cyrillic can be mixed in one line
 $entries = @(
-  "1989 HELLO WORLD"
-  # "1990 IT WORKS!"
+  # "1989 HELLO WORLD"
+  "1990 IT WORKS!"
   # "1991 OOPS!"
   # "1992 I DID IT AGAIN"
   # "1993 DO NOT DEBUG!"
@@ -130,7 +130,11 @@ if ((git rev-parse --is-inside-work-tree 2>$null) -ne 'true') {
   throw 'run this script from inside a git repository'
 }
 
-# --- main loop --------------------------------------------------------------
+# --- planning pass ----------------------------------------------------------
+# first pass only builds the list of days to light up for every entry,
+# so the total number of commits is known before the progress bar starts
+$plan = New-Object System.Collections.ArrayList
+
 foreach ($entry in $entries) {
   # split "1989 HELLO WORLD" into year and text
   $year, $text = $entry -split ' ', 2
@@ -166,28 +170,77 @@ foreach ($entry in $entries) {
   $start  = $jan1.AddDays(-[int]$jan1.DayOfWeek)
   # center the text horizontally
   $offset = [math]::Floor((53 - $cols.Count) / 2)
-  $n = 0
 
+  # collect every day that has to be lit for this entry
+  $days = New-Object System.Collections.ArrayList
   for ($i = 0; $i -lt $cols.Count; $i++) {
     for ($y = 0; $y -lt 5; $y++) {
       if ($cols[$i][$y] -eq 'X') {
         $d = $start.AddDays(($offset + $i) * 7 + $y + 1)
         # skip days that spill into the neighbouring year
         if ($d.Year -ne $year) { continue }
-        if (-not $dryRun) {
-          # backdate both author and committer so github places the commit on that day
-          $iso = $d.ToString("yyyy-MM-dd") + "T12:00:00"
-          $env:GIT_AUTHOR_DATE = $iso
-          $env:GIT_COMMITTER_DATE = $iso
-          # empty commits: no file changes needed
-          1..$perDay | ForEach-Object { git commit --allow-empty -q -m "$year $text" }
-        }
-        $n += $perDay
+        [void]$days.Add($d)
       }
     }
   }
-  Write-Host "$year '$text': $n commits"
+
+  # remember the entry together with its days
+  [void]$plan.Add([pscustomobject]@{ Year = $year; Text = $text; Days = $days })
 }
+
+# total commits across all entries = lit days * commits per day
+$litDays = 0
+foreach ($p in $plan) { $litDays += $p.Days.Count }
+$total = $litDays * $perDay
+
+# --- main loop --------------------------------------------------------------
+$done    = 0     # commits made so far
+$lastPct = -1    # last percent shown, used to avoid redrawing the bar needlessly
+$sw      = [System.Diagnostics.Stopwatch]::StartNew()   # for the eta estimate
+
+foreach ($p in $plan) {
+  $n = 0   # commits made for this entry
+
+  foreach ($d in $p.Days) {
+    if (-not $dryRun) {
+      # backdate both author and committer so github places the commit on that day
+      $iso = $d.ToString("yyyy-MM-dd") + "T12:00:00"
+      $env:GIT_AUTHOR_DATE = $iso
+      $env:GIT_COMMITTER_DATE = $iso
+    }
+
+    for ($k = 0; $k -lt $perDay; $k++) {
+      # empty commits: no file changes needed
+      if (-not $dryRun) { git commit --allow-empty -q -m "$($p.Year) $($p.Text)" }
+      $done++
+      $n++
+
+      # redraw the bar only when the whole percent changes (and on the last commit)
+      $pct = [int][math]::Floor(100 * $done / $total)
+      if ($pct -ne $lastPct -or $done -eq $total) {
+        $lastPct = $pct
+
+        # eta = average time per commit * commits left
+        $eta = ''
+        if ($done -gt 0 -and $done -lt $total) {
+          $secLeft = [int]($sw.Elapsed.TotalSeconds / $done * ($total - $done))
+          $eta = ", eta {0:mm\:ss}" -f [timespan]::FromSeconds($secLeft)
+        }
+
+        Write-Progress -Activity "drawing graph text" `
+          -Status "$($p.Year) '$($p.Text)': $done / $total commits ($pct%)$eta" `
+          -PercentComplete $pct
+      }
+    }
+  }
+
+  # progress bar is transient, so print a permanent line per entry
+  Write-Host "$($p.Year) '$($p.Text)': $n commits"
+}
+
+# close the progress bar
+Write-Progress -Activity "drawing graph text" -Completed
+Write-Host ("done: {0} commits in {1:mm\:ss}" -f $done, $sw.Elapsed)
 
 # clean up env vars so they do not leak into later git commands
 Remove-Item Env:GIT_AUTHOR_DATE, Env:GIT_COMMITTER_DATE -ErrorAction SilentlyContinue
