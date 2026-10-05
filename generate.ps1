@@ -21,8 +21,8 @@ $entries = @(
   # "1996 DELETE PROD" # !!! not all text
   # "1997 NOT TODAY"
   # "1998 NO REGRETS"
-  "1999 I KNOW BETTER"
-  # "2000 STAY HUNGRY"
+  # "1999 I KNOW BETTER"
+  "2000 STAY HUNGRY"
   # "2001 DREAM BIG"
   # "2002 MADONNA"
   # "2003 JESSICA LANGE"
