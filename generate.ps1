@@ -12,9 +12,9 @@ $dryRun = $false     # true = only count commits, do not create or push anything
 # one entry = "year text"; latin and cyrillic can be mixed in one line
 $entries = @(
   # "1989 HELLO WORLD"
-  "1990 IT WORKS!"
-  # "1991 OOPS!"
-  # "1992 I DID IT AGAIN"
+  # "1990 IT WORKS!"
+  "1991 OOPS!"
+  "1992 I DID IT AGAIN"
   # "1993 DO NOT DEBUG!"
   # "1994 WORKS SOMEHOW"
   # "1995 WORKS FOR ME"
